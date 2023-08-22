@@ -1,0 +1,7 @@
+gym==0.25.2
+slimevolleygym
+pyqlearning
+matplotlib
+opencv-python
+numpy
+pyglet
