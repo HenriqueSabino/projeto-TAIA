@@ -1,35 +1,29 @@
 import gym
 import numpy as np
-import cv2
 import collections
+
+class RenderWrapper(gym.Wrapper):
+    def init(self, env=None):
+        super(RenderWrapper, self).__init__(env)
+        self.last_obs = None
+
+    @property
+    def render_mode(self):
+        return 'rgb_array'
     
-class MaxAndSkipEnv(gym.Wrapper):
-    def __init__(self, env=None, skip=4):
-        """Return only every `skip`-th frame"""
-        super(MaxAndSkipEnv, self).__init__(env)
-        # most recent raw observations (for max pooling across time steps)
-        self._obs_buffer = collections.deque(maxlen=2)
-        self._skip = skip
-
-    def step(self, action):
-        total_reward = 0.0
-        done = None
-        for _ in range(self._skip):
-            obs, reward, done, info = self.env.step(action)
-            self._obs_buffer.append(obs)
-            total_reward += reward
-            if done:
-                break
-        max_frame = np.max(np.stack(self._obs_buffer), axis=0)
-        return max_frame, total_reward, done, info
-
     def reset(self):
-        """Clear past frame buffer and init. to first obs. from inner env."""
-        self._obs_buffer.clear()
         obs = self.env.reset()
-        self._obs_buffer.append(obs)
+        self.last_obs = obs
         return obs
     
+    def step(self, action):
+        step_tuple = super().step(action)
+        self.last_obs = step_tuple[0]
+        return step_tuple
+
+    def render(self, *args, **kwargs):
+        return self.last_obs
+
 class BufferWrapper(gym.ObservationWrapper):
     def __init__(self, env, n_steps, dtype=np.float32):
         super(BufferWrapper, self).__init__(env)
