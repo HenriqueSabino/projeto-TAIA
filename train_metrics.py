@@ -3,9 +3,10 @@ import numpy as np
 from stable_baselines3.common.callbacks import BaseCallback
 
 class ModelMetricsCallback(BaseCallback):
-    def __init__(self, eval_env: gym.Env, num_episodes = 10, verbose=1):
+    def __init__(self, eval_env: gym.Env, save_path, num_episodes = 10, verbose=1):
         super().__init__(verbose)
         self.eval_env = eval_env
+        self.save_path = save_path
         self.num_episodes = num_episodes
         self.mean_rewards = []
         self.rewards_stds = []
@@ -17,14 +18,13 @@ class ModelMetricsCallback(BaseCallback):
         for _ in range(self.num_episodes):       
           obs = self.eval_env.reset()
           done = False
+          ep_sum_rewards = 0
           while not done:
               action, _ = self.model.predict(obs, deterministic=True)
               obs, reward, done, _ = self.eval_env.step(int(action))
-              rewards.append(reward)
-
-              if (self.verbose >= 2):
-                  print(f'reward: {reward}')
-                  print(f'sum of rewards: {rewards}')
+              ep_sum_rewards += reward
+        
+          rewards.append(ep_sum_rewards)
           
           if (self.verbose >= 2):
               print('Episode done')
@@ -39,5 +39,7 @@ class ModelMetricsCallback(BaseCallback):
 
         self.mean_rewards.append(mean_reward)
         self.rewards_stds.append(rewards_std)
+        np.savetxt(f'{self.save_path}/mean_rewards.csv', self.mean_rewards, delimiter=',')
+        np.savetxt(f'{self.save_path}/rewards_stds.csv', self.rewards_stds, delimiter=',')
 
         return True
