@@ -3,13 +3,13 @@ import numpy as np
 from stable_baselines3.common.callbacks import BaseCallback
 
 class ModelMetricsCallback(BaseCallback):
-    def __init__(self, eval_env: gym.Env, save_path, num_episodes = 10, verbose=1):
+    def __init__(self, eval_env: gym.Env, save_path, num_episodes = 10, mean_rewards = [], rewards_stds = [],verbose=1):
         super().__init__(verbose)
         self.eval_env = eval_env
         self.save_path = save_path
         self.num_episodes = num_episodes
-        self.mean_rewards = []
-        self.rewards_stds = []
+        self.mean_rewards = mean_rewards
+        self.rewards_stds = rewards_stds
         
     def _on_step(self) -> bool:
         assert self.parent is not None, "``StopTrainingOnMinimumReward`` callback must be used " "with an ``EventCallback``"
