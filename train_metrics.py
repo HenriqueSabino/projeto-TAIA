@@ -39,7 +39,7 @@ class ModelMetricsCallback(BaseCallback):
 
         self.mean_rewards.append(mean_reward)
         self.rewards_stds.append(rewards_std)
-        np.savetxt(f'{self.save_path}/mean_rewards.csv', self.mean_rewards, delimiter=',')
-        np.savetxt(f'{self.save_path}/rewards_stds.csv', self.rewards_stds, delimiter=',')
+        np.savetxt(f'{self.save_path}/mean_rewards.txt', self.mean_rewards)
+        np.savetxt(f'{self.save_path}/rewards_stds.txt', self.rewards_stds)
 
         return True
