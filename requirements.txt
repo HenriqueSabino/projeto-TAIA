@@ -6,3 +6,4 @@ numpy
 pyglet
 shimmy
 stable-baselines3
+optuna
